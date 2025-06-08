@@ -17,6 +17,7 @@ setup(
     python_requires='>=3.8',
     install_requires=[
         "networkx",
+        "datasets",
         # We will add other dependencies here as the project grows
     ],
     extras_require={

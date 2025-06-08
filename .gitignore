@@ -26,3 +26,6 @@ dist/
 # Secrets - just in case
 *.env
 secrets.yaml
+
+# Data files
+data_corpus/
