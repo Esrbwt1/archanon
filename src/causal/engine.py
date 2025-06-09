@@ -21,27 +21,27 @@ class CausalEngine:
         self._memory = memory_core
         print("CausalEngine v0.1 initialized.")
 
+    # In src/causal/engine.py
+
     def deduce_property(self, source_id: str, property_label: str) -> bool:
         """
-        Deduces if a node inherits a property through 'is_a' relationships.
-
-        This method traverses the graph upwards from the source_id along 'is_a'
-        edges. If it finds a parent node that has the target property, it
-        returns True.
-
-        Example:
-        - Graph: Socrates -> is_a -> human -> is_a -> mortal
-        - Query: deduce_property("Socrates", "mortal")
-        - Result: True
+        Deduces if a node has a property, either directly or via inheritance.
+        v1.1: Now checks for direct 'has_property' relationships first.
 
         Args:
-            source_id (str): The starting node (e.g., "Socrates").
-            property_label (str): The property we are checking for (e.g., "mortal").
+            source_id (str): The starting node (e.g., "Socrates", "The cat").
+            property_label (str): The property we are checking for (e.g., "mortal", "fluffy").
 
         Returns:
-            True if the property is inherited, False otherwise.
+            True if the property is held, False otherwise.
         """
-        # First, check if the node itself is the property.
+        # --- NEW: Step 1: Check for direct properties ---
+        direct_properties = self._memory.query_relationships(source_id, "has_property")
+        if property_label in direct_properties:
+            return True # Found a direct property, reasoning is complete.
+
+        # --- EXISTING: Step 2: Check for inherited properties via 'is_a' ---
+        # First, check if the node itself is the property (e.g., ask_question("cat", "animal"))
         if source_id == property_label:
             return True
 
@@ -56,10 +56,10 @@ class CausalEngine:
             parents = self._memory.query_relationships(current_node, "is_a")
             for parent in parents:
                 if parent == property_label:
-                    return True  # Found the property
+                    return True  # Found the property via inheritance
                 
                 if parent not in visited_nodes:
                     visited_nodes.add(parent)
                     nodes_to_visit.append(parent)
         
-        return False # Traversed the whole relevant hierarchy and didn't find the property.
+        return False # Checked direct and inherited properties, found nothing.

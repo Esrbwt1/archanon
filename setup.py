@@ -18,6 +18,7 @@ setup(
     install_requires=[
         "networkx",
         "datasets",
+        "spacy>=3.0.0",
         # We will add other dependencies here as the project grows
     ],
     extras_require={
